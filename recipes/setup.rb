@@ -22,13 +22,30 @@ end
 
 # Ruby and bundler
 include_recipe 'deployer'
-if node['platform_family'] == 'debian'
-  include_recipe 'ruby-ng::dev'
-else
-  ruby_pkg_version = node['ruby-ng']['ruby_version'].split('.')[0..1]
-  package "ruby#{ruby_pkg_version.join('')}"
-  package "ruby#{ruby_pkg_version.join('')}-devel"
-  execute "/usr/sbin/alternatives --set ruby /usr/bin/ruby#{ruby_pkg_version.join('.')}"
+
+# if node['platform_family'] == 'debian'
+#   include_recipe 'ruby-ng::dev'
+# else
+#   ruby_pkg_version = node['ruby-ng']['ruby_version'].split('.')[0..1]
+#   package "ruby#{ruby_pkg_version.join('')}"
+#   package "ruby#{ruby_pkg_version.join('')}-devel"
+#   execute "/usr/sbin/alternatives --set ruby /usr/bin/ruby#{ruby_pkg_version.join('.')}"
+# end
+
+# Install ruby via ruby_build
+include_recipe 'ruby_build'
+
+ruby_build_ruby node['ruby_build']['version']
+link '/usr/bin/ruby' do
+  to "/usr/local/ruby/#{node['ruby_build']['version']}/bin/ruby"
+end
+
+# Install bundler
+execute 'Install bundler' do
+  command '/usr/bin/ruby -S gem install bundler'
+end
+link '/usr/local/bin/bundle' do
+  to "/usr/local/ruby/#{node['ruby_build']['version']}/bin/bundle"
 end
 
 apt_repository 'apache2' do
@@ -40,19 +57,19 @@ apt_repository 'apache2' do
   only_if { node['defaults']['webserver']['use_apache2_ppa'] }
 end
 
-gem_package 'bundler' do
-  action :install
-end
+# gem_package 'bundler' do
+#   action :install
+# end
 
-if node['platform_family'] == 'debian'
-  link '/usr/local/bin/bundle' do
-    to '/usr/bin/bundle'
-  end
-else
-  link '/usr/local/bin/bundle' do
-    to '/usr/local/bin/bundler'
-  end
-end
+# if node['platform_family'] == 'debian'
+#   link '/usr/local/bin/bundle' do
+#     to '/usr/bin/bundle'
+#   end
+# else
+#   link '/usr/local/bin/bundle' do
+#     to '/usr/local/bin/bundler'
+#   end
+# end
 
 execute 'yum-config-manager --enable epel' if node['platform_family'] == 'rhel'
 

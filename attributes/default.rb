@@ -56,6 +56,11 @@ default['defaults']['appserver']['worker_processes'] = 4
 default['defaults']['appserver']['log_requests'] = false
 default['defaults']['appserver']['thread_min'] = 0
 default['defaults']['appserver']['thread_max'] = 16
+default['defaults']['appserver']['worker_killer']['enabled'] = false
+default['defaults']['appserver']['worker_killer']['ram'] = 1024
+default['defaults']['appserver']['worker_killer']['frequency'] = 60
+default['defaults']['appserver']['worker_killer']['rolling_restart_frequency'] = 43200
+default['defaults']['appserver']['worker_killer']['reaper_status_logs'] = false
 
 ## thin
 

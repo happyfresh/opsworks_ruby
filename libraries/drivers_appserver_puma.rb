@@ -5,7 +5,7 @@ module Drivers
     class Puma < Drivers::Appserver::Base
       adapter :puma
       allowed_engines :puma
-      output filter: %i[log_requests preload_app thread_max thread_min timeout worker_processes]
+      output filter: %i[log_requests preload_app thread_max thread_min timeout worker_processes worker_killer]
 
       def appserver_config
         'puma.rb'

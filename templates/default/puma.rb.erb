@@ -3,9 +3,9 @@
 # The directory to operate out of.
 directory "<%= @deploy_dir %>/current"
 
-<% if @out[:preload_app] %>
+<% if @out[:preload_app] -%>
   preload_app!
-<% end %>
+<% end -%>
 
 # Set the environment in which the rack's app will run. The value must be a string.
 # The default is "development".
@@ -38,9 +38,9 @@ stdout_redirect "<%= @deploy_dir %>/shared/log/puma.stdout.log", "<%= @deploy_di
 
 # Disable request logging.
 # The default is "false".
-<% unless @out[:log_requests] %>
+<% unless @out[:log_requests] -%>
 quiet
-<% end %>
+<% end -%>
 
 # Configure "min" to be the minimum number of threads to use to answer
 # requests and "max" the maximum.
@@ -54,11 +54,12 @@ threads <%= @out[:thread_min] %>, <%= @out[:thread_max] %>
 # bind 'unix:///var/run/puma.sock'
 # bind 'unix:///var/run/puma.sock?umask=0777'
 # bind 'ssl://127.0.0.1:9292?key=path_to_key&cert=path_to_cert'
-<% if @webserver == 'apache2' %>
+<% if @webserver == 'apache2' -%>
 bind "tcp://127.0.0.1:3000"
-<% else %>
+<% else -%>
 bind "unix://<%= @deploy_dir %>/shared/sockets/puma.sock"
-<% end %>
+<% end -%>
+
 # === Cluster mode ===
 # How many worker processes to run.
 # The default is "0".
@@ -68,3 +69,18 @@ workers <%= @out[:worker_processes] %>
 # The default is 60
 worker_timeout <%= @out[:timeout] %>
 
+<% if @out[:worker_killer][:enabled] -%>
+# Worker killer config
+require 'puma_worker_killer'
+before_fork do
+  PumaWorkerKiller.config do |config|
+    config.ram           = <%= @out[:worker_killer][:ram] %> # mb
+    config.frequency     = <%= @out[:worker_killer][:frequency] %> # seconds
+    config.percent_usage = <%= @out[:worker_killer][:percent_usage] %>
+    config.rolling_restart_frequency = <%= @out[:worker_killer][:rolling_restart_frequency] %> # seconds
+    config.reaper_status_logs = <%= @out[:worker_killer][:reaper_status_logs] %>
+    config.pre_term = -> (worker) { puts "Worker #{worker.inspect} being killed" }
+  end
+  PumaWorkerKiller.start
+end
+<% end -%>

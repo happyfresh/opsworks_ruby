@@ -16,6 +16,7 @@ module Drivers
       def deploy_before_restart
         setup_application_yml
         setup_dot_env
+        setup_app_env
       end
 
       def after_deploy
@@ -100,6 +101,11 @@ module Drivers
       def setup_dot_env
         return unless raw_out[:dot_env]
         env_config(source_file: 'dot_env', destination_file: '.env')
+      end
+
+      def setup_app_env
+        return unless raw_out[:app_env]
+        env_config(source_file: 'app_env')
       end
 
       # rubocop:disable Metrics/MethodLength

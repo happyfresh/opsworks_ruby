@@ -46,6 +46,7 @@ default['defaults']['scm']['remove_scm_files'] = true
 
 default['defaults']['appserver']['adapter'] = 'puma'
 default['defaults']['appserver']['application_yml'] = false
+default['defaults']['appserver']['app_env'] = true
 default['defaults']['appserver']['dot_env'] = false
 default['defaults']['appserver']['preload_app'] = true
 default['defaults']['appserver']['timeout'] = 60

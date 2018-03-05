@@ -120,6 +120,8 @@ module Drivers
           variables environment: env
         end
 
+        return unless options[:destination_file]
+
         context.link File.join(deploy_to, 'current', options[:destination_file]) do
           to File.join(deploy_to, 'shared', options[:source_file])
         end
